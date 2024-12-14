@@ -285,7 +285,6 @@
             height: 100%;
             position: relative;
             perspective: 1000px;
-            touch-action: pan-y;
         }
         .card {
             position: absolute;
@@ -739,11 +738,10 @@
         let currentCardIndex = 0;
         let currentFace = 0;
 
-        // Variables para manejo de gestos de deslizamiento
-        let pointerStartX = 0;
-        let pointerStartY = 0;
-        let pointerEndX = 0;
-        let pointerEndY = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
 
         // Función para seleccionar un conjunto de flashcards
         function selectSet(setName) {
@@ -925,50 +923,47 @@
             adjustFontSize(back.querySelector('h2'));
             adjustFontSize(explanation.querySelector('h2'));
 
-            // Manejo de gestos de deslizamiento usando eventos pointer
-            flashcard.addEventListener('pointerdown', handlePointerDown);
-            flashcard.addEventListener('pointerup', handlePointerUp);
+            flashcard.addEventListener('touchstart', handleTouchStart, false);
+            flashcard.addEventListener('touchmove', handleTouchMove, false);
+            flashcard.addEventListener('touchend', handleTouchEnd, false);
 
-            // Función para manejar el inicio del gesto
-            function handlePointerDown(event) {
-                pointerStartX = event.clientX;
-                pointerStartY = event.clientY;
-            }
+            // Lógica de clic: top -> tarjeta anterior, bottom -> tarjeta siguiente
+            // Centro dividido en 2: izquierda (cara anterior), derecha (cara siguiente)
+            flashcard.addEventListener('click', (e) => {
+                let rect = flashcard.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                let width = rect.width;
+                let height = rect.height;
 
-            // Función para manejar el fin del gesto
-            function handlePointerUp(event) {
-                pointerEndX = event.clientX;
-                pointerEndY = event.clientY;
-                detectSwipeGesture();
-            }
+                let topZone = height * 0.2;
+                let bottomZone = height * 0.8;
 
-            // Función para detectar y manejar gestos de deslizamiento
-            function detectSwipeGesture() {
-                let deltaX = pointerEndX - pointerStartX;
-                let deltaY = pointerEndY - pointerStartY;
-                const threshold = 50; // Mínimo desplazamiento para considerar un swipe
-
-                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    if (deltaX > threshold) {
-                        // Swipe derecho: Tarjeta anterior
-                        changeCard('prev');
-                    } else if (deltaX < -threshold) {
-                        // Swipe izquierdo: Tarjeta siguiente
-                        changeCard('next');
-                    }
-                } else {
-                    if (deltaY > threshold) {
-                        // Swipe hacia abajo: Tarjeta anterior
-                        changeCard('prev');
-                    } else if (deltaY < -threshold) {
-                        // Swipe hacia arriba: Tarjeta siguiente
-                        changeCard('next');
-                    }
+                if (y < topZone) {
+                    // Arriba: tarjeta anterior
+                    changeCard('prev');
+                    return;
                 }
-            }
+                if (y > bottomZone) {
+                    // Abajo: tarjeta siguiente
+                    changeCard('next');
+                    return;
+                }
+
+                // Zona media
+                let midLeft = width / 2;
+                if (x < midLeft) {
+                    // Izquierda: cara anterior
+                    flipCard('prev');
+                } else {
+                    // Derecha: cara siguiente
+                    flipCard('next');
+                }
+            });
 
             return flashcard;
         }
+
 
         // Función para ajustar el tamaño de la fuente dinámicamente
         function adjustFontSize(element) {
@@ -1069,6 +1064,33 @@
             classifications[cardKey] = level;
             localStorage.setItem('classifications', JSON.stringify(classifications));
             showNotification(`Tarjeta clasificada como ${level}`, 'success');
+        }
+
+        // Manejo de eventos táctiles
+        function handleTouchStart(event) {
+            touchStartY = event.touches[0].clientY;
+            touchStartX = event.touches[0].clientX;
+        }
+        function handleTouchMove(event) {
+            touchEndY = event.touches[0].clientY;
+            touchEndX = event.touches[0].clientX;
+        }
+        function handleTouchEnd() {
+            let deltaY = touchEndY - touchStartY;
+            let deltaX = touchEndX - touchStartX;
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 50) {
+                    flipCard('prev');
+                } else if (deltaX < -50) {
+                    flipCard('next');
+                }
+            } else {
+                if (deltaY > 50) {
+                    changeCard('prev');
+                } else if (deltaY < -50) {
+                    changeCard('next');
+                }
+            }
         }
 
         // Función para alternar tema día/noche
