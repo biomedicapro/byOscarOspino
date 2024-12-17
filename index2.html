@@ -129,7 +129,7 @@
         }
 
         /* Centrar las cajas de asignaturas */
-        .set-list {
+        .set-list, .review-level-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
@@ -137,7 +137,7 @@
             justify-items: center;
             justify-content: center;
         }
-        .set-card {
+        .set-card, .review-level-card {
             background-color: #fff;
             border-radius: 15px;
             padding: 25px 20px;
@@ -149,16 +149,16 @@
             flex-direction: column;
             align-items: center;
         }
-        .set-card:hover {
+        .set-card:hover, .review-level-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        .set-card i {
+        .set-card i, .review-level-card i {
             font-size: 50px;
             color: #3498DB;
             margin-bottom: 15px;
         }
-        .set-card h3 {
+        .set-card h3, .review-level-card h3 {
             margin: 0;
             font-size: 22px;
             font-weight: 500;
@@ -166,20 +166,20 @@
             margin-bottom: 10px;
             text-align: center;
         }
-        .set-card p {
+        .set-card p, .review-level-card p {
             margin: 5px 0;
             color: #7F8C8D;
             font-size: 16px;
             text-align: center;
         }
-        .set-card .button-group {
+        .set-card .button-group, .review-level-card .button-group {
             margin-top: auto;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
         }
-        .set-card button {
+        .set-card button, .review-level-card button {
             padding: 10px 15px;
             background-color: #5DADE2;
             color: #fff;
@@ -191,16 +191,16 @@
             align-items: center;
             transition: background-color 0.3s;
         }
-        .set-card button:hover {
+        .set-card button:hover, .review-level-card button:hover {
             background-color: #3498DB;
         }
-        .set-card button i {
+        .set-card button i, .review-level-card button i {
             margin-right: 8px;
         }
-        .set-card button + button {
+        .set-card button + button, .review-level-card button + button {
             background-color: #1ABC9C;
         }
-        .set-card button + button:hover {
+        .set-card button + button:hover, .review-level-card button + button:hover {
             background-color: #16A085;
         }
         /* Botones de clasificación */
@@ -452,27 +452,27 @@
         body.night-mode header::after {
             background: rgba(255,255,255,0.05);
         }
-        body.night-mode .set-card {
+        body.night-mode .set-card, body.night-mode .review-level-card {
             background-color: #2C3E50;
             color: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-        body.night-mode .set-card:hover {
+        body.night-mode .set-card:hover, body.night-mode .review-level-card:hover {
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
         }
-        body.night-mode .set-card i {
+        body.night-mode .set-card i, body.night-mode .review-level-card i {
             color: #1ABC9C;
         }
-        body.night-mode .set-card button {
+        body.night-mode .set-card button, body.night-mode .review-level-card button {
             background-color: #1ABC9C;
         }
-        body.night-mode .set-card button:hover {
+        body.night-mode .set-card button:hover, body.night-mode .review-level-card button:hover {
             background-color: #16A085;
         }
-        body.night-mode .set-card button + button {
+        body.night-mode .set-card button + button, body.night-mode .review-level-card button + button {
             background-color: #E67E22;
         }
-        body.night-mode .set-card button + button:hover {
+        body.night-mode .set-card button + button:hover, body.night-mode .review-level-card button + button:hover {
             background-color: #D35400;
         }
         body.night-mode .card {
@@ -538,10 +538,10 @@
 
         /* Sin cambiar a columna en pantallas pequeñas para las categorías de dificultad */
         @media (max-width: 768px) {
-            .set-list {
+            .set-list, .review-level-list {
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
-            .set-card {
+            .set-card, .review-level-card {
                 width: 100%;
             }
             .flashcard {
@@ -594,10 +594,8 @@
     <!-- Sección para seleccionar nivel de revisión -->
     <div class="section review-level-section" id="review-level-section">
         <h3>Selecciona el nivel de tarjetas a revisar en <span id="review-set-name"></span></h3>
-        <div class="classification-options">
-            <button class="hard" onclick="reviewClassified('Difícil')"><i class="fas fa-frown"></i> Difíciles</button>
-            <button class="medium" onclick="reviewClassified('Medio')"><i class="fas fa-meh"></i> Medias</button>
-            <button class="easy" onclick="reviewClassified('Fácil')"><i class="fas fa-smile"></i> Fáciles</button>
+        <div class="review-level-list" id="review-level-list">
+            <!-- Cajas de niveles se cargarán dinámicamente -->
         </div>
     </div>
 
@@ -761,6 +759,7 @@
                 selectedSet = setName;
                 document.getElementById('review-set-name').innerText = setName;
                 showSection('review-level-section');
+                loadReviewLevels(); // Cargar las cajas de niveles con conteo
                 applyTheme();
             }
         }
@@ -966,6 +965,7 @@
             return flashcard;
         }
 
+
         // Función para ajustar el tamaño de la fuente dinámicamente
         function adjustFontSize(element) {
             let maxFontSize = 28; // en px
@@ -978,7 +978,7 @@
             }
         }
 
-        // Actualizar barra de progreso
+        // Actualizar barra de progreso y contadores en review-level-section
         function updateProgress() {
             let progressElement = document.getElementById('progress');
             let progressValue = ((currentCardIndex + 1) / flashcards.length) * 100;
@@ -993,7 +993,12 @@
                 };
                 localStorage.setItem('progress', JSON.stringify(progress));
                 // Actualizar el conteo en la interfaz
-                document.getElementById(`progress-${setName}`).innerText = `${currentReviewed}/${flashcardSets[setName].length} tarjetas revisadas`;
+                document.getElementById(`progress-${setName}`).innerText = `${currentReviewed}/${flashcardSets[selectedSet].length} tarjetas revisadas`;
+            }
+            // Actualizar contadores en review-level-section si está activa
+            const activeSection = document.querySelector('.section.active').id;
+            if (activeSection === 'review-level-section') {
+                loadReviewLevels(); // Recalcular y actualizar los conteos
             }
         }
 
@@ -1165,7 +1170,9 @@
             }, 3000);
         }
 
-        // Función para regresar y limpiar el nivel de revisión
+        /**
+         * Función para regresar y limpiar el nivel de revisión
+         */
         function goBack() {
             const activeSection = document.querySelector('.section.active').id;
             if (activeSection === 'main-section') {
@@ -1178,36 +1185,65 @@
             }
         }
 
-        // Función para mostrar una sección
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
+        /**
+         * Función para cargar las cajas de niveles de revisión con conteos
+         */
+        function loadReviewLevels() {
+            let reviewLevelList = document.getElementById('review-level-list');
+            reviewLevelList.innerHTML = '';
 
-            const backButton = document.querySelector('.back-button');
-            if (sectionId === 'main-section') {
-                document.getElementById('logout-button').style.display = 'block';
-                document.querySelector('.fullscreen-button').style.display = 'block';
-                backButton.style.display = 'block'; // Mostrar el botón en main-section
-            } else if (sectionId === 'flashcard-section' || sectionId === 'review-level-section') {
-                document.querySelector('.fullscreen-button').style.display = 'block';
-                document.getElementById('logout-button').style.display = 'none';
-                backButton.style.display = 'block';
-            } else {
-                document.getElementById('logout-button').style.display = 'none';
-                document.querySelector('.fullscreen-button').style.display = 'none';
-                backButton.style.display = 'none';
-            }
+            const levels = ['Fácil', 'Medio', 'Difícil'];
+            const setName = selectedSet;
+
+            levels.forEach(level => {
+                let available = 0;
+                let reviewed = 0;
+
+                flashcardSets[setName].forEach((card, index) => {
+                    let cardKey = `${setName}-${index}`;
+                    if (classifications[cardKey] === level) {
+                        available++;
+                        // Determinar si la tarjeta ha sido revisada
+                        if (progress[setName] && index < progress[setName].totalReviewed) {
+                            reviewed++;
+                        }
+                    }
+                });
+
+                let card = document.createElement('div');
+                card.className = 'review-level-card';
+                card.innerHTML = `
+                    <i class="${getLevelIcon(level)}"></i>
+                    <h3>${level}</h3>
+                    <p>Revisadas: ${reviewed} / Disponibles: ${available}</p>
+                    <div class="button-group">
+                        <button onclick="reviewClassified('${level}')"><i class="${getLevelButtonIcon(level)}"></i> Revisar</button>
+                    </div>
+                `;
+                reviewLevelList.appendChild(card);
+                gsap.from(card, {duration: 0.5, y: 20, opacity: 0});
+            });
         }
 
-        // Inicialización
-        window.onload = () => {
-            showSection('main-section');
-            loadSets();
-            applyTheme();
-            checkAuthorizationStatus(); // Verificar autorización al cargar
-            // Verificar autorización periódicamente (cada 10 segundos)
-            setInterval(checkAuthorizationStatus, 10000);
-        };
+        // Función para obtener el ícono correspondiente a cada nivel
+        function getLevelIcon(level) {
+            const icons = {
+                'Fácil': 'fas fa-smile',
+                'Medio': 'fas fa-meh',
+                'Difícil': 'fas fa-frown'
+            };
+            return icons[level] || 'fas fa-question';
+        }
+
+        // Función para obtener el ícono del botón de revisar según el nivel
+        function getLevelButtonIcon(level) {
+            const icons = {
+                'Fácil': 'fas fa-play',
+                'Medio': 'fas fa-play',
+                'Difícil': 'fas fa-play'
+            };
+            return icons[level] || 'fas fa-play';
+        }
 
         /**
          * Función para cerrar sesión y redirigir al inicio
@@ -1221,9 +1257,7 @@
             }, 2000);
         }
 
-        /**
-         * Función para verificar autorización
-         */
+        // Función para verificar autorización
         async function checkAuthorizationStatus() {
             const loggedInUser = localStorage.getItem('loggedInUser');
             const sessionToken = localStorage.getItem('sessionToken');
@@ -1262,6 +1296,77 @@
             e.preventDefault();
             logoutAndRedirect();
         });
+
+        // Función para mostrar una sección
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            const backButton = document.querySelector('.back-button');
+            if (sectionId === 'main-section') {
+                document.getElementById('logout-button').style.display = 'block';
+                document.querySelector('.fullscreen-button').style.display = 'block';
+                backButton.style.display = 'block'; // Mostrar el botón en main-section
+            } else if (sectionId === 'flashcard-section' || sectionId === 'review-level-section') {
+                document.querySelector('.fullscreen-button').style.display = 'block';
+                document.getElementById('logout-button').style.display = 'none';
+                backButton.style.display = 'block';
+            } else {
+                document.getElementById('logout-button').style.display = 'none';
+                document.querySelector('.fullscreen-button').style.display = 'none';
+                backButton.style.display = 'none';
+            }
+        }
+
+        // Inicialización
+        window.onload = () => {
+            showSection('main-section');
+            loadSets();
+            applyTheme();
+            checkAuthorizationStatus(); // Verificar autorización al cargar
+            // Verificar autorización periódicamente (cada 10 segundos)
+            setInterval(checkAuthorizationStatus, 10000);
+        };
+
+        /**
+         * Función para cargar las cajas de niveles de revisión con conteos
+         */
+        function loadReviewLevels() {
+            let reviewLevelList = document.getElementById('review-level-list');
+            reviewLevelList.innerHTML = '';
+
+            const levels = ['Fácil', 'Medio', 'Difícil'];
+            const setName = selectedSet;
+
+            levels.forEach(level => {
+                let available = 0;
+                let reviewed = 0;
+
+                flashcardSets[setName].forEach((card, index) => {
+                    let cardKey = `${setName}-${index}`;
+                    if (classifications[cardKey] === level) {
+                        available++;
+                        // Determinar si la tarjeta ha sido revisada
+                        if (progress[setName] && index < progress[setName].totalReviewed) {
+                            reviewed++;
+                        }
+                    }
+                });
+
+                let card = document.createElement('div');
+                card.className = 'review-level-card';
+                card.innerHTML = `
+                    <i class="${getLevelIcon(level)}"></i>
+                    <h3>${level}</h3>
+                    <p>Revisadas: ${reviewed} / Disponibles: ${available}</p>
+                    <div class="button-group">
+                        <button onclick="reviewClassified('${level}')"><i class="${getLevelButtonIcon(level)}"></i> Revisar</button>
+                    </div>
+                `;
+                reviewLevelList.appendChild(card);
+                gsap.from(card, {duration: 0.5, y: 20, opacity: 0});
+            });
+        }
     </script>
 </body>
 </html>
