@@ -1332,7 +1332,7 @@
             const backButton = document.querySelector('.back-button');
             if (sectionId === 'main-section') {
                 document.getElementById('logout-button').style.display = 'block';
-                document.querySelector('.fullscreen-button').style.display = 'block';
+                document.querySelector('.fullscreen-button').style.display = 'none';
                 backButton.style.display = 'block'; // Mostrar el botón en main-section
             } else if (sectionId === 'flashcard-section' || sectionId === 'review-level-section') {
                 document.querySelector('.fullscreen-button').style.display = 'block';
@@ -1340,7 +1340,7 @@
                 backButton.style.display = 'block';
             } else {
                 document.getElementById('logout-button').style.display = 'none';
-                document.querySelector('.fullscreen-button').style.display = 'none';
+                document.querySelector('.fullscreen-button').style.display = 'block';
                 backButton.style.display = 'none';
             }
         }
