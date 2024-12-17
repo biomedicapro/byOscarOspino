@@ -341,15 +341,16 @@
         }
         /* Clasificación */
         .classification {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            z-index: 2;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: flex; /* Activa Flexbox */
+	    flex-direction: row; /* Asegura que los botones estén en fila */
+	    justify-content: center; /* Distribuye uniformemente */
+	    align-items: center; /* Centra los botones verticalmente */
+	    gap: 10px; /* Espacio entre botones */
+	    padding: 10px; /* Espaciado interno */
+	    width: 100%; /* Ocupa todo el ancho disponible */
+	    flex-wrap: nowrap; /* Evita que los botones salten a otra fila */
+	    position: absolute; /* Fija la barra en la parte inferior */
+	    bottom: 10px; /* Espacio desde el borde inferior */
         }
         .classification button {
             padding: 14px 22px;
