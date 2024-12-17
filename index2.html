@@ -83,7 +83,7 @@
             font-size: 20px;
             cursor: pointer;
             z-index: 1;
-            display: block;
+            display: block; /* Mostrar en todas las secciones relevantes */
         }
 
         /* Secciones */
@@ -738,10 +738,11 @@
         let currentCardIndex = 0;
         let currentFace = 0;
 
-        let touchStartY = 0;
-        let touchEndY = 0;
-        let touchStartX = 0;
-        let touchEndX = 0;
+        // Variables para eventos de puntero
+        let pointerStartX = 0;
+        let pointerStartY = 0;
+        let pointerEndX = 0;
+        let pointerEndY = 0;
 
         // Función para seleccionar un conjunto de flashcards
         function selectSet(setName) {
@@ -923,9 +924,10 @@
             adjustFontSize(back.querySelector('h2'));
             adjustFontSize(explanation.querySelector('h2'));
 
-            flashcard.addEventListener('touchstart', handleTouchStart, false);
-            flashcard.addEventListener('touchmove', handleTouchMove, false);
-            flashcard.addEventListener('touchend', handleTouchEnd, false);
+            // Agregar eventos de puntero
+            flashcard.addEventListener('pointerdown', handlePointerDown, false);
+            flashcard.addEventListener('pointermove', handlePointerMove, false);
+            flashcard.addEventListener('pointerup', handlePointerUp, false);
 
             // Lógica de clic: top -> tarjeta anterior, bottom -> tarjeta siguiente
             // Centro dividido en 2: izquierda (cara anterior), derecha (cara siguiente)
@@ -964,7 +966,6 @@
             return flashcard;
         }
 
-
         // Función para ajustar el tamaño de la fuente dinámicamente
         function adjustFontSize(element) {
             let maxFontSize = 28; // en px
@@ -984,14 +985,15 @@
             progressElement.style.width = progressValue + '%';
 
             if (selectedSet && !reviewLevel) {
-                let currentReviewed = Math.max(progress[selectedSet]?.totalReviewed || 0, currentCardIndex + 1);
-                progress[selectedSet] = {
+                let setName = selectedSet; // Asegurar que 'setName' está definido
+                let currentReviewed = Math.max(progress[setName]?.totalReviewed || 0, currentCardIndex + 1);
+                progress[setName] = {
                     totalReviewed: currentReviewed,
                     currentIndex: currentCardIndex
                 };
                 localStorage.setItem('progress', JSON.stringify(progress));
                 // Actualizar el conteo en la interfaz
-                document.getElementById(`progress-${selectedSet}`).innerText = `${currentReviewed}/${flashcardSets[selectedSet].length} tarjetas revisadas`;
+                document.getElementById(`progress-${setName}`).innerText = `${currentReviewed}/${flashcardSets[setName].length} tarjetas revisadas`;
             }
         }
 
@@ -1066,30 +1068,46 @@
             showNotification(`Tarjeta clasificada como ${level}`, 'success');
         }
 
-        // Manejo de eventos táctiles
-        function handleTouchStart(event) {
-            touchStartY = event.touches[0].clientY;
-            touchStartX = event.touches[0].clientX;
+        // Manejo de eventos de puntero
+        function handlePointerDown(event) {
+            pointerStartX = event.clientX;
+            pointerStartY = event.clientY;
         }
-        function handleTouchMove(event) {
-            touchEndY = event.touches[0].clientY;
-            touchEndX = event.touches[0].clientX;
+        function handlePointerMove(event) {
+            pointerEndX = event.clientX;
+            pointerEndY = event.clientY;
         }
-        function handleTouchEnd() {
-            let deltaY = touchEndY - touchStartY;
-            let deltaX = touchEndX - touchStartX;
+        function handlePointerUp(event) {
+            let deltaX = pointerEndX - pointerStartX;
+            let deltaY = pointerEndY - pointerStartY;
+
+            let gestureDetected = false;
+
+            // Detectar deslizamientos horizontales
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 if (deltaX > 50) {
+                    // Deslizar hacia la derecha: anterior
                     flipCard('prev');
+                    gestureDetected = true;
                 } else if (deltaX < -50) {
+                    // Deslizar hacia la izquierda: siguiente
                     flipCard('next');
+                    gestureDetected = true;
                 }
             } else {
                 if (deltaY > 50) {
+                    // Deslizar hacia abajo: tarjeta anterior
                     changeCard('prev');
+                    gestureDetected = true;
                 } else if (deltaY < -50) {
+                    // Deslizar hacia arriba: tarjeta siguiente
                     changeCard('next');
+                    gestureDetected = true;
                 }
+            }
+
+            if (gestureDetected) {
+                event.preventDefault();
             }
         }
 
@@ -1149,10 +1167,12 @@
 
         // Función para regresar y limpiar el nivel de revisión
         function goBack() {
-	    const activeSection = document.querySelector('.section.active').id;	
+            const activeSection = document.querySelector('.section.active').id;
             if (activeSection === 'main-section') {
-		window.location.href = 'index.html';
+                // Redirigir a index.html
+                window.location.href = 'index.html';
             } else {
+                // Volver a la sección principal
                 showSection('main-section');
                 loadSets();
             }
@@ -1166,8 +1186,8 @@
             const backButton = document.querySelector('.back-button');
             if (sectionId === 'main-section') {
                 document.getElementById('logout-button').style.display = 'block';
-                document.querySelector('.fullscreen-button').style.display = 'none';
-                backButton.style.display = 'block';
+                document.querySelector('.fullscreen-button').style.display = 'block';
+                backButton.style.display = 'block'; // Mostrar el botón en main-section
             } else if (sectionId === 'flashcard-section' || sectionId === 'review-level-section') {
                 document.querySelector('.fullscreen-button').style.display = 'block';
                 document.getElementById('logout-button').style.display = 'none';
