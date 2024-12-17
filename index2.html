@@ -11,6 +11,11 @@
     <!-- Incluir Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
     <style>
+        /* Global box-sizing */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         /* Estilos generales */
         body {
             margin: 0;
@@ -128,12 +133,12 @@
             color: #2C3E50;
         }
 
-        /* Centrar las cajas de asignaturas */
+        /* Centrar las cajas de asignaturas y niveles */
         .set-list, .review-level-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 30px;
-            padding: 30px;
+            gap: 20px;
+            padding: 20px;
             justify-items: center;
             justify-content: center;
         }
@@ -148,6 +153,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 100%; /* Asegura que no exceda el ancho del contenedor */
+            overflow: hidden; /* Oculta contenido que exceda */
         }
         .set-card:hover, .review-level-card:hover {
             transform: translateY(-5px);
@@ -165,12 +172,14 @@
             color: #2C3E50;
             margin-bottom: 10px;
             text-align: center;
+            word-wrap: break-word; /* Permite que el texto se ajuste en múltiples líneas */
         }
         .set-card p, .review-level-card p {
             margin: 5px 0;
             color: #7F8C8D;
             font-size: 16px;
             text-align: center;
+            word-wrap: break-word;
         }
         .set-card .button-group, .review-level-card .button-group {
             margin-top: auto;
@@ -190,6 +199,8 @@
             display: flex;
             align-items: center;
             transition: background-color 0.3s;
+            width: 100%; /* Hace que el botón ocupe todo el ancho disponible */
+            justify-content: center; /* Centra el contenido del botón */
         }
         .set-card button:hover, .review-level-card button:hover {
             background-color: #3498DB;
@@ -536,13 +547,15 @@
             color: #333 !important;
         }
 
-        /* Sin cambiar a columna en pantallas pequeñas para las categorías de dificultad */
+        /* Responsividad para pantallas pequeñas */
         @media (max-width: 768px) {
             .set-list, .review-level-list {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                grid-template-columns: 1fr; /* Una columna para evitar solapamientos */
+                gap: 15px; /* Reducir el espacio entre cajas */
+                padding: 15px; /* Reducir el padding general */
             }
             .set-card, .review-level-card {
-                width: 100%;
+                width: 100%; /* Asegurar que las tarjetas ocupen todo el ancho disponible */
             }
             .flashcard {
                 width: 100%;
@@ -557,6 +570,20 @@
                 right: 50%;
                 transform: translateX(50%);
                 align-items: center;
+            }
+            /* Ajustes específicos para review-level-card */
+            .review-level-card h3 {
+                font-size: 20px; /* Reducir tamaño de fuente */
+            }
+            .review-level-card p {
+                font-size: 14px; /* Reducir tamaño de fuente */
+            }
+            .review-level-card i {
+                font-size: 40px; /* Reducir tamaño de ícono */
+            }
+            .review-level-card button {
+                padding: 8px 12px; /* Reducir padding del botón */
+                font-size: 14px; /* Reducir tamaño de fuente del botón */
             }
         }
     </style>
@@ -1221,7 +1248,7 @@
                     </div>
                 `;
                 reviewLevelList.appendChild(card);
-                gsap.from(card, {duration: 0.5, y: 20, opacity: 0});
+                gsap.from(card, {duration: 0.5, y: 20, opacity: 0, ease: "power1.out"});
             });
         }
 
@@ -1364,7 +1391,7 @@
                     </div>
                 `;
                 reviewLevelList.appendChild(card);
-                gsap.from(card, {duration: 0.5, y: 20, opacity: 0});
+                gsap.from(card, {duration: 0.5, y: 20, opacity: 0, ease: "power1.out"});
             });
         }
     </script>
