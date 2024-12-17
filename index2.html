@@ -83,7 +83,7 @@
             font-size: 20px;
             cursor: pointer;
             z-index: 1;
-            display: none;
+            display: block;
         }
 
         /* Secciones */
@@ -1149,11 +1149,9 @@
 
         // Función para regresar y limpiar el nivel de revisión
         function goBack() {
-            if (document.getElementById('flashcard-section').classList.contains('active') ||
-                document.getElementById('review-level-section').classList.contains('active')) {
-                // Al volver a la sección principal se refresca el listado y el conteo
-                showSection('main-section');
-                loadSets();
+	    const activeSection = document.querySelector('.section.active').id;	
+            if (activeSection === 'main-section') {
+		window.location.href = 'index.html';
             } else {
                 showSection('main-section');
                 loadSets();
@@ -1168,8 +1166,8 @@
             const backButton = document.querySelector('.back-button');
             if (sectionId === 'main-section') {
                 document.getElementById('logout-button').style.display = 'block';
-                document.querySelector('.fullscreen-button').style.display = 'block';
-                backButton.style.display = 'none';
+                document.querySelector('.fullscreen-button').style.display = 'none';
+                backButton.style.display = 'block';
             } else if (sectionId === 'flashcard-section' || sectionId === 'review-level-section') {
                 document.querySelector('.fullscreen-button').style.display = 'block';
                 document.getElementById('logout-button').style.display = 'none';
